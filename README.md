@@ -19,7 +19,7 @@ automatic: when a new version is pushed here, the panel shows an **Update** butt
 
 ## Before using
 
-- Install the free **Montserrat** font (fonts.google.com) for the intended look.
+- The installer auto-installs the Montserrat font and enables debug mode. Nothing else to set up.
 - Make a caption file: `pip install faster-whisper`, then
   `python extension/host/transcribe.py yourvideo.mp4` → gives a `.srt`.
   (Or use the panel's **Transcribe active video + caption** button.)
