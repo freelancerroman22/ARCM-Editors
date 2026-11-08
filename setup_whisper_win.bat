@@ -1,34 +1,39 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 echo ============================================
 echo  ARCM Edits - one-time transcription setup
 echo ============================================
 echo.
 
-echo [1/2] Checking for Python...
-where python >nul 2>&1
-if %ERRORLEVEL%==0 goto HAVEPY
+REM --- find a REAL python (the py launcher is most reliable; the bare "python"
+REM     may be a Microsoft Store stub that is not actually installed) ---
+set "PYCMD="
+py -3 -c "import sys" >nul 2>&1 && set "PYCMD=py -3"
+if not defined PYCMD ( python -c "import sys" >nul 2>&1 && set "PYCMD=python" )
 
-echo Python not found. Trying to install it with winget...
-winget install -e --id Python.Python.3.12 --accept-source-agreements --accept-package-agreements
-where python >nul 2>&1
-if %ERRORLEVEL%==0 goto HAVEPY
+if not defined PYCMD (
+  echo [1/2] Python not found. Trying to install it with winget...
+  winget install -e --id Python.Python.3.12 --accept-source-agreements --accept-package-agreements
+  py -3 -c "import sys" >nul 2>&1 && set "PYCMD=py -3"
+  if not defined PYCMD ( python -c "import sys" >nul 2>&1 && set "PYCMD=python" )
+)
 
-echo.
-echo Could not install Python automatically.
-echo Please install Python from https://www.python.org/downloads/
-echo ( tick "Add Python to PATH" during install ), then run this file again.
-start "" "https://www.python.org/downloads/"
-pause
-exit /b 1
+if not defined PYCMD (
+  echo.
+  echo Could not set up Python automatically.
+  echo Easiest fix: install Python from https://www.python.org/downloads/
+  echo During install, TICK "Add python.exe to PATH", then run this file again.
+  start "" "https://www.python.org/downloads/"
+  pause
+  exit /b 1
+)
 
-:HAVEPY
-echo Python found.
+echo [1/2] Python OK  ( using: !PYCMD! )
 echo.
 echo [2/2] Installing faster-whisper (first time downloads a few hundred MB)...
-python -m pip install --upgrade pip
-python -m pip install faster-whisper
-if %ERRORLEVEL% NEQ 0 (
+!PYCMD! -m pip install --upgrade pip
+!PYCMD! -m pip install faster-whisper
+if errorlevel 1 (
   echo.
   echo Install failed. Check your internet connection and run again.
   pause
