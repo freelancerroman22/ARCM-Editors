@@ -38,7 +38,12 @@
     <div class="mini" id="updmsg"></div>
   </div>
 
-  <div class="card">
+  <div class="card" id="prnote" style="display:none;border-color:#caa23a;background:#352c13">
+    <b style="color:#ffd400">Premiere Pro mode</b>
+    <div class="mini" style="color:#e8edf4">This imports your .srt as a native Premiere caption track (static, style it in the Captions panel). The animated word-by-word look is After Effects only — build it there and bring it in with Dynamic Link.</div>
+  </div>
+
+  <div class="card" id="tplcard">
     <label>Template</label>
     <select id="tpl"></select>
     <div class="row" style="margin-top:8px">
@@ -56,7 +61,7 @@
     <div class="mini">Make the .srt with transcribe.py first. The active comp must hold your video.</div>
   </div>
 
-  <div class="card">
+  <div class="card" id="autocard">
     <label>Auto-transcribe (needs Python + faster-whisper)</label>
     <div class="two">
       <div><label>Python</label><input type="text" id="py" value="python3"></div>
@@ -75,12 +80,21 @@
 (function(){
   "use strict";
   // ===== version + update config =====
-  var LOCAL_VERSION = "1.1.0";
+  var LOCAL_VERSION = "1.2.0";
   var RAW = "https://raw.githubusercontent.com/freelancerroman22/ARCM-Editors/main/extension/";
 
   var cs = new CSInterface();
   var $ = function(id){ return document.getElementById(id); };
   $("verlabel").textContent = "v" + LOCAL_VERSION;
+
+  // detect host app: After Effects (AEFT) vs Premiere Pro (PPRO)
+  var isPr = (cs.getApplicationID() === "PPRO");
+  if (isPr){
+    $("prnote").style.display = "block";
+    $("tplcard").style.display = "none";
+    $("autocard").style.display = "none";
+    $("run").textContent = "Import .srt as Premiere captions";
+  }
 
   // ===== templates =====
   var D={font:"Montserrat-ExtraBold",fontFallback:"Arial-BoldMT",upper:false,fontSize:150,autoScale:true,
@@ -130,6 +144,10 @@
 
   $("run").addEventListener("click",function(){
     status("Pick your .srt file…");
+    if (isPr){
+      cs.evalScript("flexPprImport()", function(res){ status(res.indexOf("OK")===0 ? "✓ "+res.substring(4) : res); });
+      return;
+    }
     cs.evalScript("flexBuildFromFile("+JSON.stringify(JSON.stringify(buildCfg()))+")", function(res){
       status(res.indexOf("OK")===0 ? "✓ "+res.substring(4) : res); });
   });

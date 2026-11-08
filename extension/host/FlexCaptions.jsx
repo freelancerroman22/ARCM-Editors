@@ -213,6 +213,19 @@ function flexBuildFromFile(cfgJson){
     }catch(e){ return "ERR: "+e.toString()+(e.line?(" (line "+e.line+")"):""); }
 }
 
+// ---------- Premiere Pro: import SRT as a native caption track ----------
+function flexPprImport(){
+    try{
+        if (typeof app==="undefined" || !app.project) return "ERR: Open a Premiere project first.";
+        var f=File.openDialog("Pick a .srt caption file","*.srt;*.*");
+        if (!f) return "ERR: No file chosen.";
+        var ok=false;
+        try{ ok=app.project.importFiles([f.fsName], true, app.project.rootItem, false); }
+        catch(e1){ try{ ok=app.project.importFiles([f.fsName]); }catch(e2){ return "ERR: Import failed: "+e2.toString(); } }
+        return "OK: Imported '"+f.name+"' into the Project panel. Drag it onto your sequence, then style it in the Captions panel. (Premiere captions are static; use After Effects for the animated look.)";
+    }catch(e){ return "ERR: "+e.toString(); }
+}
+
 function flexOsWin(){ return $.os && $.os.toLowerCase().indexOf("windows")>=0; }
 function flexActiveVideo(comp){
     var cand=[]; try{ var sl=comp.selectedLayers; for (var i=0;i<sl.length;i++) cand.push(sl[i]); }catch(e){}

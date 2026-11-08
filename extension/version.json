@@ -1,6 +1,6 @@
 {
-  "version": "1.1.0",
-  "notes": "34 text presets (big-keyword sample look + color variants, box, caps, bounce).",
+  "version": "1.2.0",
+  "notes": "Premiere Pro mode: panel now imports the .srt as a native caption track in Premiere (animated captions stay After Effects only).",
   "files": [
     "client/index.html",
     "client/CSInterface.js",
