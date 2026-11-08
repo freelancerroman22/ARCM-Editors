@@ -4,7 +4,6 @@
   "files": [
     "client/index.html",
     "client/CSInterface.js",
-    "host/FlexCaptions.jsx",
-    "CSXS/manifest.xml"
+    "host/FlexCaptions.jsx"
   ]
 }

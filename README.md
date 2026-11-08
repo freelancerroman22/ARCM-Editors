@@ -1,4 +1,4 @@
-# FlexCaptions — ARCM Editors
+# ARCM Edits
 
 A self-updating After Effects panel that builds viral, CapCut-style captions
 (word-by-word, keyword highlight, big-keyword layout, pop/bounce). Once installed it
@@ -11,7 +11,7 @@ checks this repo for updates and offers a one-click **Update** inside the panel.
    - **Windows:** double-click `install_win.bat` (if warned, "More info → Run anyway").
    - **Mac:** right-click `install_mac.command` → Open.
 3. Quit After Effects completely, reopen it.
-4. **Window → Extensions → FlexCaptions**.
+4. **Window → Extensions → ARCM Edits**.
 
 The installer turns on CEP debug mode (needed for unsigned panels) and copies the
 `extension/` folder into your Adobe CEP extensions folder. After this, updates are

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionList>
-  <Extension Id="com.flexcaptions.panel">
+  <Extension Id="com.arcmedits.panel">
     <HostList>
       <Host Name="AEFT" Port="8088"/>
       <Host Name="PPRO" Port="8089"/>

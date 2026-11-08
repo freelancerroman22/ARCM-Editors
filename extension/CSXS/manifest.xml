@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ExtensionManifest Version="11.0" ExtensionBundleId="com.flexcaptions.panel" ExtensionBundleVersion="1.0.0"
-  ExtensionBundleName="FlexCaptions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<ExtensionManifest Version="11.0" ExtensionBundleId="com.arcmedits.panel" ExtensionBundleVersion="1.0.0"
+  ExtensionBundleName="ARCM Edits" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <ExtensionList>
-    <Extension Id="com.flexcaptions.panel" Version="1.0.0" />
+    <Extension Id="com.arcmedits.panel" Version="1.0.0" />
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>
@@ -17,7 +17,7 @@
     </RequiredRuntimeList>
   </ExecutionEnvironment>
   <DispatchInfoList>
-    <Extension Id="com.flexcaptions.panel">
+    <Extension Id="com.arcmedits.panel">
       <DispatchInfo>
         <Resources>
           <MainPath>./client/index.html</MainPath>
@@ -34,7 +34,7 @@
         </Lifecycle>
         <UI>
           <Type>Panel</Type>
-          <Menu>FlexCaptions</Menu>
+          <Menu>ARCM Edits</Menu>
           <Geometry>
             <Size><Height>600</Height><Width>340</Width></Size>
             <MinSize><Height>360</Height><Width>280</Width></MinSize>
