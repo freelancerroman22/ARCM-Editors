@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>FlexCaptions</title>
+<style>
+  :root{ --bg:#23272e; --panel:#2b313a; --edge:#3a424e; --fg:#e8edf4; --muted:#95a0b0; --accent:#1e99ff; --good:#2ecb7a; }
+  html,body{margin:0;background:var(--bg);color:var(--fg);font:12px/1.4 -apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{padding:12px}
+  h1{font-size:14px;margin:0 0 2px;font-weight:800}
+  .sub{color:var(--muted);font-size:10.5px;margin:0 0 10px}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:8px;padding:10px;margin-bottom:10px}
+  label{display:block;color:var(--muted);font-size:10.5px;margin:0 0 3px}
+  select,input[type=text],input[type=number]{width:100%;box-sizing:border-box;background:#1c2129;color:var(--fg);
+    border:1px solid var(--edge);border-radius:6px;padding:6px;font-size:12px}
+  .row{display:flex;gap:8px}.row>div{flex:1}
+  .chk{display:flex;align-items:center;gap:6px;color:var(--fg);font-size:11.5px;margin-top:8px;cursor:pointer}
+  button{width:100%;border:0;border-radius:7px;padding:9px;font-weight:700;cursor:pointer;font-size:12px}
+  .primary{background:var(--accent);color:#fff;margin-top:4px}
+  .ghost{background:#333b47;color:var(--fg);border:1px solid var(--edge)}
+  .mini{color:var(--muted);font-size:10px;margin-top:6px;line-height:1.5}
+  .two{display:flex;gap:8px;align-items:flex-end}.two>div{flex:1}
+  #status{margin-top:10px;font-size:11px;white-space:pre-wrap;min-height:28px}
+  #updbar{display:none;background:#143b2a;border:1px solid var(--good);border-radius:8px;padding:9px;margin-bottom:10px;font-size:11.5px}
+  #updbar b{color:var(--good)}
+  #updbtn{margin-top:7px;background:var(--good);color:#06240f}
+  .ver{color:var(--muted);font-size:9.5px;text-align:right;margin-top:-4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>FlexCaptions</h1>
+  <p class="sub">Viral auto-captions for After Effects.</p>
+
+  <div id="updbar">
+    <b>Update available</b> <span id="updver"></span>
+    <button id="updbtn">Update now</button>
+    <div class="mini" id="updmsg"></div>
+  </div>
+
+  <div class="card">
+    <label>Template</label>
+    <select id="tpl"></select>
+    <div class="row" style="margin-top:8px">
+      <div><label>Words</label><input type="number" id="words" value="3" min="1" max="6"></div>
+      <div><label>Position %</label><input type="number" id="pos" value="62" min="40" max="90"></div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div><label>Layout</label><select id="layout"><option value="line">one line</option><option value="bigword">big keyword</option></select></div>
+      <div style="display:flex;align-items:flex-end"><label class="chk" style="margin:0"><input type="checkbox" id="upper"> UPPERCASE</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <button class="primary" id="run">Pick .srt and caption comp</button>
+    <div class="mini">Make the .srt with transcribe.py first. The active comp must hold your video.</div>
+  </div>
+
+  <div class="card">
+    <label>Auto-transcribe (needs Python + faster-whisper)</label>
+    <div class="two">
+      <div><label>Python</label><input type="text" id="py" value="python3"></div>
+      <div><label>Model</label><select id="model"><option>tiny</option><option>base</option><option selected>small</option><option>medium</option></select></div>
+    </div>
+    <button class="ghost" id="auto" style="margin-top:8px">Transcribe active video + caption</button>
+    <div class="mini">AE freezes while it runs. Beta.</div>
+  </div>
+
+  <div id="status">Select a comp, pick a template, then caption.</div>
+  <div class="ver" id="verlabel"></div>
+</div>
+
+<script src="CSInterface.js"></script>
+<script>
+(function(){
+  "use strict";
+  // ===== version + update config =====
+  var LOCAL_VERSION = "1.0.0";
+  var RAW = "https://raw.githubusercontent.com/freelancerroman22/ARCM-Editors/main/extension/";
+
+  var cs = new CSInterface();
+  var $ = function(id){ return document.getElementById(id); };
+  $("verlabel").textContent = "v" + LOCAL_VERSION;
+
+  // ===== templates =====
+  var D={font:"Montserrat-ExtraBold",fontFallback:"Arial-BoldMT",upper:false,fontSize:150,autoScale:true,
+    wordsPerGroup:3,yPercent:62,baseColor:[1,1,1],highlightColor:[0.118,0.6,1],highlightMode:"keyword",
+    strokeOn:false,strokeColor:[0,0,0],strokeWidth:12,anim:"pop",popScale:118,animDur:0.14,wordStagger:0.05,
+    holdPad:0.04,layout:"line",gapBreak:0.45,maxWidthPercent:86,shadow:true,boxOn:false,boxMode:"keyword",
+    boxColor:[0.118,0.6,1],boxRound:28,boxPadX:0.18,boxPadY:0.1,emojiOn:false};
+  function T(o){ var b={}; for(var k in D) b[k]=D[k]; for(var k in o) b[k]=o[k]; return b; }
+  var TEMPLATES = {
+    "Money Blue (sample)": T({layout:"bigword"}),
+    "Hormozi Yellow":      T({upper:true,highlightColor:[1,0.831,0],strokeOn:true,strokeWidth:14,layout:"bigword"}),
+    "Hormozi Green":       T({upper:true,highlightColor:[0.224,1,0.529],strokeOn:true,strokeWidth:14,layout:"bigword"}),
+    "Beast Red":           T({upper:true,highlightColor:[1,0.176,0.176],anim:"bounce",strokeOn:true,strokeWidth:16,layout:"bigword"}),
+    "Pop Blue (one line)": T({}),
+    "Clean White":         T({highlightMode:"none"}),
+    "Box Blue":            T({highlightMode:"none",boxOn:true,boxMode:"keyword",boxColor:[0.118,0.6,1],shadow:false}),
+    "Box Yellow":          T({upper:true,highlightMode:"none",boxOn:true,boxMode:"all",boxColor:[1,0.831,0],baseColor:[0.07,0.07,0.07],shadow:false}),
+    "Neon Mint":           T({highlightColor:[0.2,1,0.749],anim:"bounce"}),
+    "One Word Punch":      T({upper:true,wordsPerGroup:1,highlightMode:"none",fontSize:165}),
+    "Podcast Lower Third": T({wordsPerGroup:4,yPercent:80,highlightColor:[1,0.831,0],anim:"rise"})
+  };
+  var sel=$("tpl"), first=null;
+  for(var k in TEMPLATES){ var o=document.createElement("option"); o.value=k; o.textContent=k; sel.appendChild(o); if(!first)first=k; }
+  sel.value=first;
+  function applyTpl(){ var t=TEMPLATES[sel.value]; $("words").value=t.wordsPerGroup; $("pos").value=t.yPercent; $("layout").value=t.layout; $("upper").checked=t.upper; }
+  applyTpl(); sel.addEventListener("change",applyTpl);
+  function buildCfg(){ var t=TEMPLATES[sel.value]; var cfg={}; for(var k in t) cfg[k]=t[k];
+    cfg.wordsPerGroup=Math.max(1,parseInt($("words").value,10)||t.wordsPerGroup);
+    cfg.yPercent=parseFloat($("pos").value)||t.yPercent; cfg.layout=$("layout").value; cfg.upper=$("upper").checked; return cfg; }
+  function status(s){ $("status").textContent=s; }
+  function hostDir(){ return cs.getSystemPath(SystemPath.EXTENSION)+"/host"; }
+
+  $("run").addEventListener("click",function(){
+    status("Pick your .srt file…");
+    cs.evalScript("flexBuildFromFile("+JSON.stringify(JSON.stringify(buildCfg()))+")", function(res){
+      status(res.indexOf("OK")===0 ? "✓ "+res.substring(4) : res); });
+  });
+  $("auto").addEventListener("click",function(){
+    status("Transcribing… AE will freeze up to a minute.");
+    var py=$("py").value||"python3", model=$("model").value||"small", dir=hostDir();
+    cs.evalScript("flexAutoTranscribe("+JSON.stringify(JSON.stringify(buildCfg()))+","+JSON.stringify(py)+","+JSON.stringify(model)+","+JSON.stringify(dir)+")",
+      function(res){ status(res.indexOf("OK")===0 ? "✓ "+res.substring(4) : res); });
+  });
+
+  // ===== auto-updater (uses CEP Node.js) =====
+  function nodeOk(){ try{ return typeof require==="function"; }catch(e){ return false; } }
+  function httpsGet(url){
+    return new Promise(function(resolve,reject){
+      try{
+        var https=require("https");
+        https.get(url, {headers:{"User-Agent":"FlexCaptions"}}, function(r){
+          if(r.statusCode>=300 && r.statusCode<400 && r.headers.location){ httpsGet(r.headers.location).then(resolve,reject); return; }
+          if(r.statusCode!==200){ reject(new Error("HTTP "+r.statusCode)); return; }
+          var d=""; r.setEncoding("utf8"); r.on("data",function(c){ d+=c; }); r.on("end",function(){ resolve(d); });
+        }).on("error",reject);
+      }catch(e){ reject(e); }
+    });
+  }
+  function verGt(a,b){ a=String(a).split("."); b=String(b).split("."); for(var i=0;i<3;i++){ var x=parseInt(a[i]||0,10), y=parseInt(b[i]||0,10); if(x>y)return true; if(x<y)return false; } return false; }
+
+  var pendingUpdate=null;
+  function checkUpdate(){
+    if(!nodeOk()) return;
+    httpsGet(RAW+"version.json?t="+Date.now()).then(function(txt){
+      var info=JSON.parse(txt);
+      if(verGt(info.version, LOCAL_VERSION)){
+        pendingUpdate=info;
+        $("updver").textContent="v"+LOCAL_VERSION+" → v"+info.version;
+        $("updmsg").textContent=info.notes||"";
+        $("updbar").style.display="block";
+      }
+    }).catch(function(){ /* offline or no file yet: ignore silently */ });
+  }
+  $("updbtn").addEventListener("click",function(){
+    if(!pendingUpdate) return;
+    var fs=require("fs"), path=require("path");
+    var root=cs.getSystemPath(SystemPath.EXTENSION);
+    var files=pendingUpdate.files||[];
+    $("updmsg").textContent="Downloading…"; $("updbtn").disabled=true;
+    var i=0;
+    function next(){
+      if(i>=files.length){
+        try{ fs.writeFileSync(path.join(root,"VERSION.txt"), pendingUpdate.version); }catch(e){}
+        var hostPath=(root+"/host/FlexCaptions.jsx").replace(/\\/g,"/");
+        cs.evalScript('$.evalFile("'+hostPath+'")', function(){ location.reload(); });
+        return;
+      }
+      var f=files[i++];
+      httpsGet(RAW+f+"?t="+Date.now()).then(function(data){
+        try{ fs.writeFileSync(path.join(root,f), data, "utf8"); }catch(e){}
+        next();
+      }).catch(function(e){ $("updmsg").textContent="Update failed: "+e.message+". Try again."; $("updbtn").disabled=false; });
+    }
+    next();
+  });
+
+  checkUpdate();
+})();
+</script>
+</body>
+</html>

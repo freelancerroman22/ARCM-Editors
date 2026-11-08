@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "notes": "First release: 11 templates, big-keyword layout, auto-transcribe.",
+  "files": [
+    "client/index.html",
+    "client/CSInterface.js",
+    "host/FlexCaptions.jsx",
+    "CSXS/manifest.xml"
+  ]
+}
