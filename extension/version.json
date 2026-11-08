@@ -1,6 +1,6 @@
 {
-  "version": "1.2.0",
-  "notes": "Premiere Pro mode: panel now imports the .srt as a native caption track in Premiere (animated captions stay After Effects only).",
+  "version": "1.2.1",
+  "notes": "Auto-detect python command per OS; added one-click Whisper setup scripts.",
   "files": [
     "client/index.html",
     "client/CSInterface.js",

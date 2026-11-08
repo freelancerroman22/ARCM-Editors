@@ -80,7 +80,7 @@
 (function(){
   "use strict";
   // ===== version + update config =====
-  var LOCAL_VERSION = "1.2.0";
+  var LOCAL_VERSION = "1.2.1";
   var RAW = "https://raw.githubusercontent.com/freelancerroman22/ARCM-Editors/main/extension/";
 
   var cs = new CSInterface();
@@ -95,6 +95,7 @@
     $("autocard").style.display = "none";
     $("run").textContent = "Import .srt as Premiere captions";
   }
+  try{ if(navigator.platform && /win/i.test(navigator.platform)) $("py").value="python"; }catch(e){}
 
   // ===== templates =====
   var D={font:"Montserrat-ExtraBold",fontFallback:"Arial-BoldMT",upper:false,fontSize:150,autoScale:true,

@@ -42,3 +42,13 @@ One Undo removes a whole batch.
 To ship an update: change files under `extension/`, bump `extension/version.json`'s
 `version` (and the `LOCAL_VERSION` baked into `extension/client/index.html`), list any
 changed files in `version.json` `files`, and push to `main`. Installed panels pick it up.
+
+## One-time transcription setup (optional)
+
+To use the panel's **Transcribe active video + caption** button, run once:
+- Windows: double-click `setup_whisper_win.bat`
+- Mac: right-click `setup_whisper_mac.command` → Open
+
+It checks for Python (installs it on Windows via winget if missing) and installs
+faster-whisper. After that, the Auto button works. If you already have an `.srt`
+(e.g. from Premiere's own transcription), you don't need this at all.
