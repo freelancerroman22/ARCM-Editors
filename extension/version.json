@@ -1,6 +1,6 @@
 {
-  "version": "1.2.1",
-  "notes": "Auto-detect python command per OS; added one-click Whisper setup scripts.",
+  "version": "1.2.2",
+  "notes": "Windows uses the 'py' launcher so transcription works even when the Microsoft Store python alias is present.",
   "files": [
     "client/index.html",
     "client/CSInterface.js",
