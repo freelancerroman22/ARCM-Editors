@@ -75,7 +75,7 @@
 (function(){
   "use strict";
   // ===== version + update config =====
-  var LOCAL_VERSION = "1.0.0";
+  var LOCAL_VERSION = "1.1.0";
   var RAW = "https://raw.githubusercontent.com/freelancerroman22/ARCM-Editors/main/extension/";
 
   var cs = new CSInterface();
@@ -89,19 +89,34 @@
     holdPad:0.04,layout:"line",gapBreak:0.45,maxWidthPercent:86,shadow:true,boxOn:false,boxMode:"keyword",
     boxColor:[0.118,0.6,1],boxRound:28,boxPadX:0.18,boxPadY:0.1,emojiOn:false};
   function T(o){ var b={}; for(var k in D) b[k]=D[k]; for(var k in o) b[k]=o[k]; return b; }
-  var TEMPLATES = {
-    "Money Blue (sample)": T({layout:"bigword"}),
-    "Hormozi Yellow":      T({upper:true,highlightColor:[1,0.831,0],strokeOn:true,strokeWidth:14,layout:"bigword"}),
-    "Hormozi Green":       T({upper:true,highlightColor:[0.224,1,0.529],strokeOn:true,strokeWidth:14,layout:"bigword"}),
-    "Beast Red":           T({upper:true,highlightColor:[1,0.176,0.176],anim:"bounce",strokeOn:true,strokeWidth:16,layout:"bigword"}),
-    "Pop Blue (one line)": T({}),
-    "Clean White":         T({highlightMode:"none"}),
-    "Box Blue":            T({highlightMode:"none",boxOn:true,boxMode:"keyword",boxColor:[0.118,0.6,1],shadow:false}),
-    "Box Yellow":          T({upper:true,highlightMode:"none",boxOn:true,boxMode:"all",boxColor:[1,0.831,0],baseColor:[0.07,0.07,0.07],shadow:false}),
-    "Neon Mint":           T({highlightColor:[0.2,1,0.749],anim:"bounce"}),
-    "One Word Punch":      T({upper:true,wordsPerGroup:1,highlightMode:"none",fontSize:165}),
-    "Podcast Lower Third": T({wordsPerGroup:4,yPercent:80,highlightColor:[1,0.831,0],anim:"rise"})
-  };
+  var PAL=[["Blue",[0.118,0.6,1]],["Yellow",[1,0.831,0]],["Green",[0.224,1,0.529]],["Red",[1,0.176,0.176]],
+    ["Orange",[1,0.541,0]],["Pink",[1,0.239,0.651]],["Purple",[0.659,0.333,0.969]],["Cyan",[0.133,0.827,0.933]]];
+  var TEMPLATES = {};
+  function addT(n,c){ TEMPLATES[n]=c; }
+  // signature / sample look
+  addT("Money Blue (sample)", T({layout:"bigword"}));
+  addT("Hormozi Yellow", T({upper:true,highlightColor:[1,0.831,0],strokeOn:true,strokeWidth:14,layout:"bigword"}));
+  addT("Hormozi Green",  T({upper:true,highlightColor:[0.224,1,0.529],strokeOn:true,strokeWidth:14,layout:"bigword"}));
+  addT("Beast Red",      T({upper:true,highlightColor:[1,0.176,0.176],anim:"bounce",strokeOn:true,strokeWidth:16,layout:"bigword"}));
+  // big-keyword (sample layout) in colors
+  for(var i=0;i<PAL.length;i++) addT("Big "+PAL[i][0], T({layout:"bigword",highlightColor:PAL[i][1]}));
+  // one-line keyword pop in colors
+  for(var i=0;i<PAL.length;i++) addT("Pop "+PAL[i][0], T({highlightColor:PAL[i][1]}));
+  // UPPERCASE pop
+  var capCols=[["Blue",[0.118,0.6,1]],["Yellow",[1,0.831,0]],["Red",[1,0.176,0.176]],["Green",[0.224,1,0.529]]];
+  for(var i=0;i<capCols.length;i++) addT("Caps "+capCols[i][0], T({upper:true,highlightColor:capCols[i][1]}));
+  // background box
+  addT("Box Blue",  T({highlightMode:"none",boxOn:true,boxMode:"keyword",boxColor:[0.118,0.6,1],shadow:false}));
+  addT("Box Green", T({highlightMode:"none",boxOn:true,boxMode:"keyword",boxColor:[0.224,1,0.529],shadow:false}));
+  addT("Box Yellow",T({upper:true,highlightMode:"none",boxOn:true,boxMode:"all",boxColor:[1,0.831,0],baseColor:[0.07,0.07,0.07],shadow:false}));
+  addT("Box Black", T({highlightMode:"none",boxOn:true,boxMode:"all",boxColor:[0,0,0],shadow:false}));
+  // extras
+  addT("Clean White",     T({highlightMode:"none"}));
+  addT("One Word Punch",  T({upper:true,wordsPerGroup:1,highlightMode:"none",fontSize:165}));
+  addT("Two Words Blue",  T({wordsPerGroup:2,highlightColor:[0.118,0.6,1]}));
+  addT("Podcast Yellow",  T({wordsPerGroup:4,yPercent:80,highlightColor:[1,0.831,0],anim:"rise"}));
+  addT("Bounce Blue",     T({highlightColor:[0.118,0.6,1],anim:"bounce"}));
+  addT("Bounce Red",      T({highlightColor:[1,0.176,0.176],anim:"bounce"}));
   var sel=$("tpl"), first=null;
   for(var k in TEMPLATES){ var o=document.createElement("option"); o.value=k; o.textContent=k; sel.appendChild(o); if(!first)first=k; }
   sel.value=first;
