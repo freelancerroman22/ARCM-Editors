@@ -32,7 +32,13 @@ echo [1/2] Python OK  ( using: !PYCMD! )
 echo.
 echo [2/2] Installing faster-whisper (first time downloads a few hundred MB)...
 !PYCMD! -m pip install --upgrade pip
-!PYCMD! -m pip install faster-whisper
+REM --only-binary avoids compiling "av" from source (no C compiler needed)
+!PYCMD! -m pip install --only-binary=:all: faster-whisper
+if errorlevel 1 (
+  echo Retrying with an explicit prebuilt av wheel...
+  !PYCMD! -m pip install --only-binary=:all: "av==11.0.0"
+  !PYCMD! -m pip install faster-whisper
+)
 if errorlevel 1 (
   echo.
   echo Install failed. Check your internet connection and run again.
